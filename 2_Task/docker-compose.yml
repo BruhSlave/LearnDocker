@@ -1,0 +1,32 @@
+# Задание 2
+#
+services:
+  web-site:
+    container_name: web-site
+    volumes:
+      - ./frontend/:/var/www/html/
+    ports:
+      - "8080:80"
+    networks:
+      custom-network:
+        ipv4_address: 172.16.1.1
+    depends_on:
+      - nginx
+  nginx:
+    container_name: nginx
+    volumes:
+      - ./nginx_config/:/etc/nginx/conf.d/
+    ports:
+      - "443:443"
+    networks:
+      custom-network:
+        ipv4_address: 172.16.1.2
+
+networks:
+  custom-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.1.0/24
+
+
