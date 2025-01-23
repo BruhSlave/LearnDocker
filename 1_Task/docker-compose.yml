@@ -1,0 +1,34 @@
+# Из задания сервис_1 был изменен на образ python с добавлением Dockerfile
+
+services:
+  service_1:
+    container_name: python
+    ports:
+      - "8090:8080"
+    volumes:
+      - ./app/:/home/web_app/
+    networks:
+      custom_network:
+        ipv4_address: 172.16.1.1
+    depends_on: 
+      - postgresql
+    build: ./web_app/
+
+  postgresql:
+    image: postgres
+    container_name: postgresql
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data/:/var/lib/postgresql/data/
+    networks:
+      custom_network:
+        ipv4_address: 172.16.1.2
+  
+networks:
+  custom_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.1.0/29 
+
