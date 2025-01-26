@@ -1,0 +1,55 @@
+services:
+  web-app:
+    container_name: web-app
+    volumes:
+      - ./flask_app/:/app/
+    ports:
+      - "5001:5000"
+    networks:
+      custom-network:
+        ipv4_address: 172.18.0.3
+    depends_on:
+      - my-sql
+    build: ./flask_app
+    environment:
+      MYSQL_HOST: my-sql
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_DATABASE: my_db
+
+  my-sql:
+    image: mysql:latest
+    container_name: my-sql
+    volumes:
+      - ./mysql_data/:/var/lib/mysql/
+    ports:
+      - "3306:3306"
+    networks:
+      custom-network:
+        ipv4_address: 172.18.0.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: my_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes: 
+      - ./nginx_conf/:/etc/nginx/conf.d
+    ports:
+      - "8080:80"
+    networks:
+      custom-network:
+        ipv4_address: 172.18.0.5
+    depends_on:
+      - web-app
+
+networks:
+  custom-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/24
+
